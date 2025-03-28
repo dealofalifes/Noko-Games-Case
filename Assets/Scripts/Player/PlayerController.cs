@@ -4,19 +4,12 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float _Acceleration = 1f;
-    [SerializeField] private float _MaxSpeed = 1f;
-    [SerializeField] private float _Friction = 20f;
-    [SerializeField] private float _RotationSpeed = 10f;
-
+    [SerializeField] private CharacterStat _Stat;
     [SerializeField] private Animator _Animator;
-    [SerializeField] private Transform _Mesh;
 
     private readonly int IsRunningHash = Animator.StringToHash("isRunning");
 
     [Header("DEBUG")]
-    [SerializeField] private Vector2 _MoveDirection;
-    [SerializeField] private Vector2 _Velocity;
     [SerializeField] private bool _IsTouching;
     [SerializeField] private bool _IsRunning;
 
@@ -50,43 +43,47 @@ public class PlayerController : MonoBehaviour
             if (_IsTouching && touch.phase == TouchPhase.Moved)
             {
                 Vector2 touchDelta = touch.deltaPosition.normalized; // Get finger movement direction
-                _MoveDirection = new Vector2(touchDelta.x, touchDelta.y);
+                _Stat.SetMoveDirection(new Vector2(touchDelta.x, touchDelta.y));
             }
         }
         else
         {
-            _MoveDirection = Vector2.zero;
+            _Stat.SetMoveDirection(Vector2.zero);
         }
     }
 
     void MovePlayer()
     {
-        if (_MoveDirection != Vector2.zero)
+        Vector2 moveDirection = _Stat.GetMoveDiraction();
+        Vector2 velocity = _Stat.GetVelocity();
+        if (moveDirection != Vector2.zero)
         {
-            _Velocity += _MoveDirection * _Acceleration * Time.deltaTime;
-            _Velocity = Vector2.ClampMagnitude(_Velocity, _MaxSpeed);
+            velocity += moveDirection * _Stat.GetAcceleration() * Time.deltaTime;
+            velocity = Vector2.ClampMagnitude(velocity, _Stat.GetMaxSpeed());
             SetRunningState(true);
         }
         else
         {
-            _Velocity = Vector2.Lerp(_Velocity, Vector2.zero, _Friction * Time.deltaTime);
-            if (_Velocity.magnitude < 0.1f)
+            velocity = Vector2.Lerp(velocity, Vector2.zero, _Stat.GetFriction() * Time.deltaTime);
+            if (velocity.magnitude < 0.1f)
             {
-                _Velocity = Vector2.zero;
+                velocity = Vector2.zero;
                 SetRunningState(false);
             }
         }
 
-        transform.position += new Vector3(_Velocity.x, 0, _Velocity.y) * Time.deltaTime;
+        _Stat.SetVelocity(velocity);
+        transform.position += new Vector3(velocity.x, 0, velocity.y) * Time.deltaTime;
     }
 
     void RotatePlayer()
     {
-        Vector3 moveDir = new Vector3(_Velocity.x, 0, _Velocity.y).normalized;
+        Vector2 velocity = _Stat.GetVelocity();
+        Vector3 moveDir = new Vector3(velocity.x, 0, velocity.y).normalized;
         if (moveDir.magnitude > 0.1f) // Avoid unnecessary rotation when velocity is too low
         {
             Quaternion targetRotation = Quaternion.LookRotation(moveDir);
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, _RotationSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, _Stat.GetRotationSpeed() * Time.deltaTime);
         }
     }
 

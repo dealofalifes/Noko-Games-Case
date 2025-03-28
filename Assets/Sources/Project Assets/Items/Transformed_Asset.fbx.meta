@@ -3,7 +3,12 @@ guid: e307afb92fed8ab43bb94f05205f1f85
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: kiremit texture
+    second: {fileID: 2800000, guid: 8b7dc4a3c8a32c84ebff1d6cae2dd3fe, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0
