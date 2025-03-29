@@ -187,18 +187,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _Targets:
-  - {fileID: 9201610714529466569}
-  - {fileID: 1719374404}
-  - {fileID: 1058597056}
-  - {fileID: 608343488}
-  - {fileID: 1697577670}
-  - {fileID: 884888865}
-  - {fileID: 648698461}
-  - {fileID: 1408705417}
   - {fileID: 567015164}
+  - {fileID: 608343488}
+  - {fileID: 648698461}
+  - {fileID: 884888865}
+  - {fileID: 1058597056}
+  - {fileID: 1408705417}
+  - {fileID: 1697577670}
+  - {fileID: 1719374404}
+  - {fileID: 9201610714529466569}
   _NPCs:
-  - {fileID: 684783886}
   - {fileID: 445364574}
+  - {fileID: 684783886}
   - {fileID: 9078000035578012301}
   _UpdateDelayInSeconds: 0.5
   _UpdateTimer: 0
