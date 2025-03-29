@@ -22,6 +22,11 @@ public class InputDropArea : MonoBehaviour, IInteractable, IDroppable
         return true;
     }
 
+    public bool IsDestructible()
+    {
+        return false;
+    }
+
     public ICollectable GetCollectable()
     {
         return null;
@@ -32,8 +37,14 @@ public class InputDropArea : MonoBehaviour, IInteractable, IDroppable
         return this;
     }
 
+    public IDestructible GetDestructible()
+    {
+        return null;
+    }
+
     public int GetInputIndex()
     {
         return _InputIndex;
     }
+
 }

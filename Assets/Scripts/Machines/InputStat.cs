@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class InputStat : MonoBehaviour
 {
-    [SerializeField] private InputController _InputController;
     [SerializeField] private Transform _StackPoint;
 
     [SerializeField] private int _RequiredStackID = 1;
@@ -42,7 +41,7 @@ public class InputStat : MonoBehaviour
         return _MaxCapacity;
     }
 
-    public int GetReuiredStackID()
+    public int GetRequiredStackID()
     {
         return _RequiredStackID;
     }

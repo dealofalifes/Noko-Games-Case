@@ -16,6 +16,11 @@ public class SpawnerCollectArea : MonoBehaviour, IInteractable, ICollectable
         return null;
     }
 
+    public IDestructible GetDestructible()
+    {
+        return null;
+    }
+
     public StorageController GetStorage()
     {
         return _Storage;
@@ -30,4 +35,10 @@ public class SpawnerCollectArea : MonoBehaviour, IInteractable, ICollectable
     {
         return false;
     }
+
+    public bool IsDestructible()
+    {
+        return false;
+    }
+
 }

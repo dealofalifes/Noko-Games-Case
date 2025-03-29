@@ -6,7 +6,6 @@ using UnityEngine;
 public class InputController : MonoBehaviour
 {
     [SerializeField] private List<InputStat> _Stats = new();
-
     public InputStat GetStatByIndex(int _index)
     {
         return _Stats[_index];

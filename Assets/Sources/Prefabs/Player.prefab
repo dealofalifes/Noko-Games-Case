@@ -86,7 +86,7 @@ Transform:
   m_GameObject: {fileID: 3475272449581179094}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalPosition: {x: 0, y: 0.42, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -108,6 +108,7 @@ GameObject:
   - component: {fileID: 1783152100471613392}
   - component: {fileID: 2337628322856086572}
   - component: {fileID: 8628210403939033103}
+  - component: {fileID: 2288385795966420072}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -165,13 +166,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0642d548c80f9fb4b8b17f32006eb810, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _Controller: {fileID: 2288385795966420072}
   _Stat: {fileID: 1783152100471613392}
   _StackController: {fileID: 562900201789367243}
   _Animator: {fileID: 5757962101851186342}
   _IsTouching: 0
   _IsRunning: 0
-  _IsCollecting: 0
-  _InteractedStorage: {fileID: 0}
+  _IsInteracting: 0
 --- !u!114 &562900201789367243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -214,7 +215,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   _StackedItems: []
   _Stat: {fileID: 1783152100471613392}
-  isCollecting: 0
+  _IsInteracting: 0
 --- !u!114 &1783152100471613392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -286,6 +287,32 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 126
   m_CollisionDetection: 0
+--- !u!143 &2288385795966420072
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7219597421349769516}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 0.2
+  m_Radius: 0.02
+  m_SlopeLimit: 45
+  m_StepOffset: 0.01
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0.6, z: 0}
 --- !u!1001 &376625680740092811
 PrefabInstance:
   m_ObjectHideFlags: 0

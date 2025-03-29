@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class StackController : MonoBehaviour
@@ -101,6 +102,7 @@ public class StackController : MonoBehaviour
             float yOffset = i * _StackSpacing;
 
             _StackedItems[i].transform.localPosition = new Vector3(0, yOffset, _StackedItems.Count > _TiltCurveEffectStart ? zOffset : 0);
+            _StackedItems[i].transform.localEulerAngles = new Vector3(0, 0, 0);
         }
     }
 
@@ -191,7 +193,20 @@ public class StackController : MonoBehaviour
                 return _StackedItems[i];
 
         return null;
+    }
 
+    public StackItem GetItem(int[] _stackIDs)
+    {
+        int length = _StackedItems.Count;
+        for (int i = length - 1; i >= 0; i--) //Start from the end to get the top item first.
+        {
+            if(_stackIDs.Length == 0) //If nothing, destroy anything.
+                return _StackedItems[i];
+
+            if (_stackIDs.Contains(_StackedItems[i].StackID)) //Check if the item ID exists in the array
+                return _StackedItems[i];
+        }
+        return null;
     }
 
     public void ItemDropStart(InputController _currentInput, InputStat _stat)
@@ -201,36 +216,59 @@ public class StackController : MonoBehaviour
 
         _DropRoutine = StartCoroutine(HandleItemDrop(_currentInput, _stat));
     }
+
+    public void ItemDropStart(TrashController _currentInput, TrashStat _stat)
+    {
+        if (_DropRoutine != null)
+            StopCoroutine(_DropRoutine);
+
+        _DropRoutine = StartCoroutine(HandleItemDrop(_currentInput, _stat));
+    }
+
     private IEnumerator HandleItemDrop(InputController _currentInput, InputStat _stat)
     {
         _IsInteracting = true;
         int maxCapacity = _stat.GetMaxCapacity();
-        int requiredStackID = _stat.GetReuiredStackID();
+        int requiredStackID = _stat.GetRequiredStackID();
         float dropItemDelay = _stat.GetDropSpeed();
         while (_IsInteracting && _stat.GetCurrentItemAmount() < maxCapacity)
         {
             StackItem currentItem = GetItem(requiredStackID);
-            if (currentItem == null)
+            if (currentItem == null || _currentInput == null)
                 break;
-
-            if (_currentInput == null)
-                break;
-
-            Vector3 stackStartPos = currentItem.transform.position;
-            Quaternion stackStartRot = currentItem.transform.rotation;
 
             GameObject item = _stat.AddInput(requiredStackID);
-            item.transform.position = stackStartPos;
-            item.transform.rotation = stackStartRot;
+            item.transform.position = currentItem.transform.position;
+            item.transform.rotation = currentItem.transform.rotation;
 
-            yield return StartCoroutine(MoveItemToInputArea(item, _stat, dropItemDelay));
+            yield return StartCoroutine(MoveItemToArea(item, _stat, dropItemDelay));
 
             yield return new WaitForSeconds(0.1f);
         }
         _IsInteracting = false;
     }
 
-    private IEnumerator MoveItemToInputArea(GameObject _item, InputStat _stat, float _speed)
+    private IEnumerator HandleItemDrop(TrashController _currentTrash, TrashStat _stat)
+    {
+        _IsInteracting = true;
+
+        int[] requiredStackID = _stat.GetRequiredStackIDs();
+        float dropItemDelay = _stat.GetDropSpeed();
+
+        while (_IsInteracting)
+        {
+            StackItem currentItem = GetItem(requiredStackID);
+            if (currentItem == null || _currentTrash == null)
+                break;
+
+            yield return StartCoroutine(MoveItemToArea(currentItem.gameObject, _stat, dropItemDelay));
+
+            yield return new WaitForSeconds(0.1f);
+        }
+        _IsInteracting = false;
+    }
+
+    private IEnumerator MoveItemToArea(GameObject _item, InputStat _stat, float _speed)
     {
         RemoveStack(_item.GetComponent<StackItem>().StackID);
 
@@ -250,8 +288,39 @@ public class StackController : MonoBehaviour
             yield return null;
         }
 
-        //_item.SetActive(false);
-        //_item.transform.localPosition = Vector3.zero;
+        _item.transform.position = _stat.GetLastStackPosition();
+        _item.transform.rotation = _stat.GetLastStackRotation();
+    }
+
+    private IEnumerator MoveItemToArea(GameObject _item, TrashStat _stat, float _speed)
+    {
+        RemoveStack(_item.GetComponent<StackItem>().StackID);
+
+        Transform originalParent = _item.transform.parent;
+        _item.transform.SetParent(null);
+        _item.gameObject.SetActive(true);
+
+        Vector3 startPos = _item.transform.position;
+        Quaternion startRot = _item.transform.rotation;
+
+        float elapsedTime = 0;
+        float duration = 0.25f;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime * _speed;
+
+            _item.transform.position = Vector3.Lerp(startPos, _stat.GetTrashPoint(), elapsedTime / duration);
+            _item.transform.rotation = Quaternion.Lerp(startRot, _stat.GetTrashRotation(), elapsedTime / duration);
+
+            yield return null;
+        }
+
+        _item.transform.SetParent(originalParent);
+        _item.gameObject.SetActive(false);
+
+        _item.transform.position = _stat.GetTrashPoint();
+        _item.transform.rotation = _stat.GetTrashRotation();
     }
 
     private Vector3 GetNextStackPosition(InputStat _stat)

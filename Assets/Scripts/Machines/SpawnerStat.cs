@@ -46,7 +46,7 @@ public class SpawnerStat : MonoBehaviour
         {
             if (item.Stat.GetCurrentItemAmount() < item.RequiredAmount)
             {
-                Debug.Log("This machine needs input ID: "+ item.Stat.GetReuiredStackID() + "/Amount: " + item.RequiredAmount + " to produce. Click on me to see!" + "", transform);
+                Debug.Log("This machine needs input ID: "+ item.Stat.GetRequiredStackID() + "/Amount: " + item.RequiredAmount + " to produce. Click on me to see!" + "", transform);
                 return false;
             }
         }
@@ -58,7 +58,7 @@ public class SpawnerStat : MonoBehaviour
     {
         foreach (var item in _RequiredInputs)
             for (int i = 0; i < item.RequiredAmount; i++)
-                item.Stat.RemoveInput(item.Stat.GetReuiredStackID()); 
+                item.Stat.RemoveInput(item.Stat.GetRequiredStackID()); 
     }
 }
 

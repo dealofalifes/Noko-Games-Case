@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,7 @@ using UnityEngine;
 [RequireComponent(typeof(StackController))]
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField] private CharacterController _Controller;
     [SerializeField] private CharacterStat _Stat;
     [SerializeField] private StackController _StackController;
     [SerializeField] private Animator _Animator;
@@ -77,7 +79,10 @@ public class PlayerController : MonoBehaviour
         }
 
         _Stat.SetVelocity(velocity);
-        transform.position += new Vector3(velocity.x, 0, velocity.y) * Time.deltaTime;
+
+        // Use CharacterController for movement
+        Vector3 moveVector = new Vector3(velocity.x, 0, velocity.y) * Time.deltaTime;
+        _Controller.Move(moveVector);
     }
 
     void RotatePlayer()
@@ -106,11 +111,11 @@ public class PlayerController : MonoBehaviour
         {
             if (_interactable.IsCollectable())
             {
-                StorageController _InteractedStorage = _interactable.GetCollectable().GetStorage();
-                if (_InteractedStorage != null && !_IsInteracting)
+                StorageController interactedStorage = _interactable.GetCollectable().GetStorage();
+                if (interactedStorage != null && !_IsInteracting)
                 {
                     _IsInteracting = true;
-                    _StackController.CollectItemsStart(_InteractedStorage);
+                    _StackController.CollectItemsStart(interactedStorage);
                 }
             }
             else if (_interactable.IsDroppable())
@@ -118,13 +123,24 @@ public class PlayerController : MonoBehaviour
                 IDroppable droppable = _interactable.GetDroppable();
                 int index = droppable.GetInputIndex();
 
-                InputController _InteractedInput = _interactable.GetDroppable().GetInputController();
+                InputController interactedInput = _interactable.GetDroppable().GetInputController();
 
-                InputStat stat = _InteractedInput.GetStatByIndex(index);
-                if (_InteractedInput != null && !_IsInteracting)
+                InputStat stat = interactedInput.GetStatByIndex(index);
+                if (interactedInput != null && !_IsInteracting)
                 {
                     _IsInteracting = true;
-                    _StackController.ItemDropStart(_InteractedInput, stat);
+                    _StackController.ItemDropStart(interactedInput, stat);
+                }
+            }
+            else if (_interactable.IsDestructible())
+            {
+                TrashController interactedTrash = _interactable.GetDestructible().GetTrashController();
+
+                TrashStat stat = interactedTrash.GetStat();
+                if (interactedTrash != null && !_IsInteracting)
+                {
+                    _IsInteracting = true;
+                    _StackController.ItemDropStart(interactedTrash, stat);
                 }
             }
         }
