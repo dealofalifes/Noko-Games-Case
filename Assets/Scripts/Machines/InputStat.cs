@@ -153,4 +153,9 @@ public class InputStat : MonoBehaviour
 
         return new Vector2(xOffset, yOffset);
     }
+
+    public bool HasSpace()
+    {
+        return _StoredInputs.Count < _MaxCapacity;
+    }
 }

@@ -76,4 +76,14 @@ public class StorageController : MonoBehaviour
 
         return item;
     }
+
+    public int GetProducedStackID()
+    {
+        return _Stat.GetProduceStackID();
+    }
+
+    public int GetProductAmount()
+    {
+        return _StoredProducts.Count;
+    }
 }

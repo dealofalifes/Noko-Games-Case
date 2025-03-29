@@ -16,18 +16,18 @@ public class StackHandlerEditor : Editor
         GUILayout.Label("Stack ID", EditorStyles.boldLabel);
         _StackID = EditorGUILayout.IntField("Stack ID:", Mathf.Clamp(_StackID, 1, 4));
 
-        StackController gridSystemController = (StackController)target;
+        StackController stackController = (StackController)target;
         if (Application.isPlaying)
         {
             if (GUILayout.Button("Add Stack"))
             {
-                gridSystemController.AddEditorStack(_StackID);
-                EditorUtility.SetDirty(gridSystemController);
+                stackController.AddEditorStack(_StackID);
+                EditorUtility.SetDirty(stackController);
             }
             if (GUILayout.Button("Remove Stack"))
             {
-                gridSystemController.RemoveEditorStack(_StackID);
-                EditorUtility.SetDirty(gridSystemController);
+                stackController.RemoveEditorStack(_StackID);
+                EditorUtility.SetDirty(stackController);
             }
             return;
         }            

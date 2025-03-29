@@ -7,6 +7,8 @@ public class StackController : MonoBehaviour
 {
     [SerializeField] private Transform _StackPoint;
 
+    [SerializeField] private AudioSource _AudioSource;
+
     [SerializeField] private int _TiltCurveEffectStart = 3;
 
     [SerializeField] private float _StackSpacing = 0.05f;
@@ -62,6 +64,9 @@ public class StackController : MonoBehaviour
         newStack.StackObject.gameObject.SetActive(true);
 
         _StackedItems.Add(newStack);
+        AdjustStackTilt();
+
+        AudioManager.Instance.PlayCollectItemSound(_AudioSource);
     }
 
     public bool RemoveStack(int _stackID)
@@ -80,6 +85,8 @@ public class StackController : MonoBehaviour
                 // Return to pool
                 currentStack.gameObject.SetActive(false);
                 _StackPool.Enqueue(currentStack);
+
+                AudioManager.Instance.PlayDropItemSound(_AudioSource);
                 return true;
             }
         }
@@ -129,20 +136,15 @@ public class StackController : MonoBehaviour
             if (_interactedStorage == null)
                 break;
 
-            while (!CanCarryMore()) //Has enough space?
+            int productAmount = _interactedStorage.GetProductAmount();
+            while (productAmount == 0 || !CanCarryMore()) //Has output to collect?
             {
                 yield return new WaitForSeconds(collectDelay);
+                productAmount = _interactedStorage.GetProductAmount();
                 continue; //Retry until exit the trigger area.
             }
 
             GameObject item = _interactedStorage.TakeProduct();
-            while (item == null) //Has output to collect?
-            {
-                yield return new WaitForSeconds(collectDelay);
-                item = _interactedStorage.TakeProduct();
-                continue; //Retry until exit the trigger area.
-            }
-
             StartCoroutine(MoveToCarryPosition(item));
 
             yield return new WaitForSeconds(collectDelay);
@@ -164,7 +166,7 @@ public class StackController : MonoBehaviour
             elapsedTime += Time.deltaTime * moveSpeed;
 
             item.transform.position = Vector3.Lerp(startPos, 
-                _StackedItems.Count > 0 ? (_StackedItems[_StackedItems.Count - 1].StackObject.position + Vector3.up * 0.2f) : _StackPoint.position, 
+                _StackedItems.Count > 0 ? (_StackedItems[_StackedItems.Count - 1].StackObject.position + Vector3.up * 0.1f) : _StackPoint.position, 
                 elapsedTime / duration);
 
             item.transform.rotation = Quaternion.Lerp(startRot ,_StackedItems.Count > 0

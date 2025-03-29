@@ -4,12 +4,13 @@ using UnityEngine;
 
 [RequireComponent(typeof(SpawnerStat))]
 [RequireComponent(typeof(StorageController))]
-public class SpawnController : MonoBehaviour
+public class SpawnController : MachineController
 {
     [SerializeField] private Animator _Animator;
     [SerializeField] private Transform _SpawnPoint;
     [SerializeField] private SpawnerStat _Stat;
     [SerializeField] private StorageController _Storage;
+    [SerializeField] private AudioSource _AudioSource;
 
     private readonly int IsProducedHash = Animator.StringToHash("Produced");
 
@@ -76,6 +77,8 @@ public class SpawnController : MonoBehaviour
         product.SetActive(true);
 
         _Storage.AddProduct(product);
+
+        AudioManager.Instance.PlayProduceItemSound(_AudioSource);
     }
 
     public void ReturnProductToPool(GameObject product)
@@ -87,5 +90,20 @@ public class SpawnController : MonoBehaviour
     public void ToggleSpawning(bool state)
     {
         _CanSpawn = state;
+    }
+
+    public override int[] GetRequiredID(int _indexIfMoreThanOne = 0)
+    {
+        return new int[] { };
+    }
+
+    public override bool HasSpace(int _indexIfMoreThanOne = 0)
+    {
+        return true;
+    }
+
+    public override bool HasProduct(int _indexIfMoreThanOne = 0)
+    {
+        return _Storage.GetProductAmount() > 0;
     }
 }

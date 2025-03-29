@@ -5,7 +5,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(CharacterStat))]
 [RequireComponent(typeof(StackController))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : CharController
 {
     [SerializeField] private CharacterController _Controller;
     [SerializeField] private CharacterStat _Stat;
@@ -17,12 +17,6 @@ public class PlayerController : MonoBehaviour
     [Header("DEBUG")]
     [SerializeField] private bool _IsTouching;
     [SerializeField] private bool _IsRunning;
-    [SerializeField] private bool _IsInteracting;
-
-    void Start()
-    {
-        _Animator = GetComponent<Animator>();
-    }
 
     void Update()
     {
@@ -105,56 +99,8 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    public override bool CanInteract(MachineController _machineController)
     {
-        if (other.TryGetComponent(out IInteractable _interactable))
-        {
-            if (_interactable.IsCollectable())
-            {
-                StorageController interactedStorage = _interactable.GetCollectable().GetStorage();
-                if (interactedStorage != null && !_IsInteracting)
-                {
-                    _IsInteracting = true;
-                    _StackController.CollectItemsStart(interactedStorage);
-                }
-            }
-            else if (_interactable.IsDroppable())
-            {
-                IDroppable droppable = _interactable.GetDroppable();
-                int index = droppable.GetInputIndex();
-
-                InputController interactedInput = _interactable.GetDroppable().GetInputController();
-
-                InputStat stat = interactedInput.GetStatByIndex(index);
-                if (interactedInput != null && !_IsInteracting)
-                {
-                    _IsInteracting = true;
-                    _StackController.ItemDropStart(interactedInput, stat);
-                }
-            }
-            else if (_interactable.IsDestructible())
-            {
-                TrashController interactedTrash = _interactable.GetDestructible().GetTrashController();
-
-                TrashStat stat = interactedTrash.GetStat();
-                if (interactedTrash != null && !_IsInteracting)
-                {
-                    _IsInteracting = true;
-                    _StackController.ItemDropStart(interactedTrash, stat);
-                }
-            }
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.TryGetComponent(out IInteractable _interactable))
-        {
-            if (_IsInteracting)
-            {
-                _IsInteracting = false;
-                _StackController.CollectItemsStop();
-            }
-        }
+        return true;
     }
 }
