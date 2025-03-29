@@ -2,9 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(CharacterStat))]
+[RequireComponent(typeof(StackController))]
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private CharacterStat _Stat;
+    [SerializeField] private StackController _StackController;
     [SerializeField] private Animator _Animator;
 
     private readonly int IsRunningHash = Animator.StringToHash("isRunning");
@@ -12,6 +15,7 @@ public class PlayerController : MonoBehaviour
     [Header("DEBUG")]
     [SerializeField] private bool _IsTouching;
     [SerializeField] private bool _IsRunning;
+    [SerializeField] private bool _IsInteracting;
 
     void Start()
     {
@@ -93,6 +97,48 @@ public class PlayerController : MonoBehaviour
         {
             _IsRunning = state;
             _Animator.SetBool(IsRunningHash, state);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.TryGetComponent(out IInteractable _interactable))
+        {
+            if (_interactable.IsCollectable())
+            {
+                StorageController _InteractedStorage = _interactable.GetCollectable().GetStorage();
+                if (_InteractedStorage != null && !_IsInteracting)
+                {
+                    _IsInteracting = true;
+                    _StackController.CollectItemsStart(_InteractedStorage);
+                }
+            }
+            else if (_interactable.IsDroppable())
+            {
+                IDroppable droppable = _interactable.GetDroppable();
+                int index = droppable.GetInputIndex();
+
+                InputController _InteractedInput = _interactable.GetDroppable().GetInputController();
+
+                InputStat stat = _InteractedInput.GetStatByIndex(index);
+                if (_InteractedInput != null && !_IsInteracting)
+                {
+                    _IsInteracting = true;
+                    _StackController.ItemDropStart(_InteractedInput, stat);
+                }
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.TryGetComponent(out IInteractable _interactable))
+        {
+            if (_IsInteracting)
+            {
+                _IsInteracting = false;
+                _StackController.CollectItemsStop();
+            }
         }
     }
 }
